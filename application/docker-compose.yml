@@ -1,0 +1,39 @@
+version: '2'
+
+services:
+    nginx:
+        build: ./nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./logs/nginx/:/var/log/nginx
+            - ./src/:/var/www/application
+
+    php:
+        build: ./php-fpm
+        volumes:
+            - ./src/:/var/www/application
+
+    phpmyadmin:
+       image: nazarpc/phpmyadmin
+       ports:
+            - "1234:80"
+       links:
+            - mysql:mysql
+
+    mysql:
+        image: mysql:5.6
+        expose:
+            - 3306
+        ports:
+            - "3306:3306"
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=ekkinox
+        volumes_from:
+            - mysql_data
+
+    mysql_data:
+       image: tianon/true
+       volumes:
+            - ./mysql/data:/var/lib/mysql
